@@ -68,12 +68,6 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
     let client = reqwest::Client::new();
     let body = "name=le%20guin&email=ursula_le_guin%40gmail.com";
 
-    // let config = configuration::get_configuration().expect("Failed to read configuration");
-    // let connection_string = config.database.connection_string();
-    // let mut connection = PgConnection::connect(&connection_string)
-    //     .await
-    //     .expect("Failed to connect to Postgres.");
-
     let response = client
         .post(format!("{}/subscriptions", &app.address))
         .header("Content-Type", "application/x-www-form-urlencoded")
