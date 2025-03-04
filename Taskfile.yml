@@ -1,0 +1,17 @@
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  PROJECT_TAG: zero2prod
+
+tasks:
+  default:
+    cmds:
+      - task --list-all
+  dockerBuild:
+    cmds:
+      - docker build --tag {{.PROJECT_TAG}} --file Dockerfile .
+  dockerRun:
+    cmds:
+      - docker run -p 8000:8000 {{.PROJECT_TAG}}

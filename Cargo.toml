@@ -30,7 +30,10 @@ tracing-actix-web = "0.7.16"
 tracing-bunyan-formatter = "0.3.10"
 tracing-futures = "0.2.5"
 tracing-log = "0.2.0"
-tracing-subscriber = { version = "0.3.19", features = ["registry", "env-filter"] }
+tracing-subscriber = { version = "0.3.19", features = [
+  "registry",
+  "env-filter",
+] }
 uuid = { version = "1.15.1", features = ["v4"] }
 
 
