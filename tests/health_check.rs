@@ -21,14 +21,14 @@ async fn spawn_app() -> TestApp {
     let connection_pool = configure_database(&configuration.database).await;
 
     let server = startup::run(listener, connection_pool.clone()).expect("Failed to bind address");
-    let _ = tokio::spawn(server);
+    tokio::spawn(server);
     TestApp {
         address,
         db_pool: connection_pool,
     }
 }
 
-pub async fn configure_database(config: &configuration::DatabaseSettings) -> PgPool {
+async fn configure_database(config: &configuration::DatabaseSettings) -> PgPool {
     let mut connection = PgConnection::connect(&config.connection_string_without_db())
         .await
         .expect("Failed to connect to Postgres");
@@ -65,14 +65,14 @@ async fn health_check_works() {
 #[actix_rt::test]
 async fn subscribe_returns_a_200_for_valid_form_data() {
     let app = spawn_app().await;
-    let config = configuration::get_configuration().expect("Failed to read configuration");
-    let connection_string = config.database.connection_string();
-    let mut connection = PgConnection::connect(&connection_string)
-        .await
-        .expect("Failed to connect to Postgres.");
-
     let client = reqwest::Client::new();
     let body = "name=le%20guin&email=ursula_le_guin%40gmail.com";
+
+    // let config = configuration::get_configuration().expect("Failed to read configuration");
+    // let connection_string = config.database.connection_string();
+    // let mut connection = PgConnection::connect(&connection_string)
+    //     .await
+    //     .expect("Failed to connect to Postgres.");
 
     let response = client
         .post(format!("{}/subscriptions", &app.address))
@@ -85,7 +85,7 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
     assert_eq!(200, response.status().as_u16());
 
     let saved = sqlx::query!("SELECT email, name from subscriptions")
-        .fetch_one(&mut connection)
+        .fetch_one(&app.db_pool)
         .await
         .expect("Failed to fetch saved subscription");
 
@@ -112,6 +112,7 @@ async fn subscribe_returns_a_400_when_data_is_missing() {
             .send()
             .await
             .expect("Failed to execute request.");
+
         // Assert
         assert_eq!(
             400,
