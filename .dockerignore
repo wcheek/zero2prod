@@ -1,2 +1,6 @@
-target
-tests
+.env
+target/
+tests/
+Dockerfile
+scripts/
+migrations/
